@@ -6,6 +6,7 @@ import SortRush from "./pages/SortRush";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
 import SortShift from "./pages/SortShift/SortShift";
+import TypeTest from "./pages/TypeTest/TypeTest";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sortshift" element={<SortShift />} />
+        <Route path="/type-test" element={<TypeTest />} />
       </Routes>
     </Router>
   );

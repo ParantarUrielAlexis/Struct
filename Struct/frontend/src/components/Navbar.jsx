@@ -18,6 +18,9 @@ const Navbar = () => {
           <li>
             <Link to="/about">About Us</Link>
           </li>
+          <li>
+            <Link to="/type-test">Type Test</Link>
+          </li>
         </ul>
       </div>
 

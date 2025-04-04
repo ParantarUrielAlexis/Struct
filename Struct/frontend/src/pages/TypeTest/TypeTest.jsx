@@ -5,8 +5,8 @@ import { FaRedo } from "react-icons/fa";
 import { FaClock } from "react-icons/fa";
 import { FaVolumeUp, FaVolumeMute } from "react-icons/fa"; // Import volume icons
 
-import typingSoundFile from "../assets/typing.mp3"; // Add your typing sound file
-import pingSoundFile from "../assets/ping.mp3"; // Add your ping sound file
+import typingSoundFile from "../../assets/typing.mp3"; // Add your typing sound file
+import pingSoundFile from "../../assets/ping.mp3"; // Add your ping sound file
 
 const words = [
   "*(arr+i)",
