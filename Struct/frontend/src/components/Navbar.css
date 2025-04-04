@@ -1,22 +1,67 @@
+
 .navbar {
   display: flex;
   justify-content: space-between;
-  background: #333;
-  color: white;
-  padding: 10px 20px;
+  align-items: center;
+  padding: 15px 40px;
+  margin-right: 25px;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  width: 40px; 
+  height: auto;
+  margin-right: 15px;
+}
+
+.logo-text {
+  font-size: 26px;
+  font-weight: 800;
+  font-family: poppins, sans-serif;
+  color: #0097a7; 
 }
 
 .nav-links {
-  list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 40px;
+  list-style: none;
+  margin-left: 30px;
 }
 
 .nav-links a {
   text-decoration: none;
-  color: white;
+  font-family: poppins, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  color: #393E46;
 }
 
-.nav-links a:hover {
-  color: #f4a261;
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+.login-btn {
+  font-size: 16px;
+  color: #393E46;
+  text-decoration: none;
+  font-weight: 600;
+  font-family: poppins, sans-serif;
+}
+
+.signup-btn {
+  background-color: #00bcd4; /* Blue-green color */
+  color: #393E46;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-family: poppins, sans-serif;
 }
