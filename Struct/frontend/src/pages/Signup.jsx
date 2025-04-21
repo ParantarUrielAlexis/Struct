@@ -1,7 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import logo from "../assets/logo.png"; // Import your Struct logo
 
 const Signup = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/accounts/signup/",
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }
+      );
+
+      if (response.status === 201) {
+        setSuccess("Account created successfully! You can now log in.");
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.error || "An error occurred. Please try again."
+      );
+    }
+  };
+
   return (
     <div className="bg-gradient-to-r from-teal-700 to-teal-600 min-h-screen flex items-center justify-center">
       <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-xl relative">
@@ -18,18 +72,26 @@ const Signup = () => {
           Join Struct Academy and start your learning journey today.
         </p>
 
+        {/* Error/Success Messages */}
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {success && (
+          <p className="text-green-500 text-center mb-4">{success}</p>
+        )}
+
         {/* Sign Up Form */}
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
-              htmlFor="name"
+              htmlFor="username"
               className="block text-sm font-medium text-gray-700"
             >
               Username
             </label>
             <input
               type="text"
-              id="name"
+              id="username"
+              value={formData.username}
+              onChange={handleChange}
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
               placeholder="Enter your username"
               required
@@ -45,6 +107,8 @@ const Signup = () => {
             <input
               type="email"
               id="email"
+              value={formData.email}
+              onChange={handleChange}
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
               placeholder="Enter your email"
               required
@@ -60,6 +124,8 @@ const Signup = () => {
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleChange}
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
               placeholder="Create a password"
               required
@@ -67,14 +133,16 @@ const Signup = () => {
           </div>
           <div>
             <label
-              htmlFor="confirm-password"
+              htmlFor="confirmPassword"
               className="block text-sm font-medium text-gray-700"
             >
               Confirm Password
             </label>
             <input
               type="password"
-              id="confirm-password"
+              id="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
               placeholder="Confirm your password"
               required
