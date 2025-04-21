@@ -17,6 +17,7 @@ import SortShift from "./pages/SortShift/SortShift"; // Import SortShift compone
 import SortShiftSelection from "./pages/SortShiftSelection/SortShiftSelection"; // Import SortShiftSelection component
 import SortShiftBubble from "./pages/SortShiftBubble/SortShiftBubble"; // Import SortShiftBubble component
 import SortShiftInsertion from "./pages/SortShiftInsertion/SortShiftInsertion"; // Import SortShiftInsertion component
+import SnakeGame from "./pages/SnakeGame"; // Import SnakeGame component
 const AppLayout = () => {
   const location = useLocation();
 
@@ -44,9 +45,10 @@ const AppLayout = () => {
   const headerOnlyRoutes = [
     "/type-test",
     "/sortshift",
-    "sortshiftselection",
+    "/sortshiftselection",
     "/sortshiftbubble",
     "/sortshiftinsertion",
+    "/snake-game",
   ];
 
   // Check if the current route is in the header-only routes
@@ -92,6 +94,7 @@ const AppLayout = () => {
               path="/sortshiftinsertion"
               element={<SortShiftInsertion />}
             />
+            <Route path="/snake-game" element={<SnakeGame />} />
           </Routes>
         </main>
       </div>
