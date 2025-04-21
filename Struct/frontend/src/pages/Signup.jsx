@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import logo from "../assets/logo.png"; // Import your Struct logo
+import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,8 @@ const Signup = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -41,7 +44,10 @@ const Signup = () => {
       );
 
       if (response.status === 201) {
-        setSuccess("Account created successfully! You can now log in.");
+        setSuccess("Account created successfully! Redirecting to login...");
+        setTimeout(() => {
+          navigate("/login");
+        }, 500);
         setFormData({
           username: "",
           email: "",
@@ -122,7 +128,7 @@ const Signup = () => {
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               value={formData.password}
               onChange={handleChange}
@@ -139,7 +145,7 @@ const Signup = () => {
               Confirm Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
@@ -147,6 +153,21 @@ const Signup = () => {
               placeholder="Confirm your password"
               required
             />
+          </div>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="showPassword"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+              className="h-4 w-4 text-teal-500 border-gray-300 rounded"
+            />
+            <label
+              htmlFor="showPassword"
+              className="ml-2 text-sm text-gray-600"
+            >
+              Show Password
+            </label>
           </div>
           <button
             type="submit"

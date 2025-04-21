@@ -1,37 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
-import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import Header from "./components/Header"; // Import Header
-
-import SortRush from "./pages/SortRush";
-import TypeTest from "./pages/TypeTest";
-import Module from "./pages/Module";
-import LandingPage from "./pages/LandingPage";
+import Navbar from "./components/Navbar";
+import Header from "./components/Header";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import CreateBadgeForm from "./pages/CreateBadgeForm";
-import SortShift from "./pages/SortShift/SortShift";
-import SortShiftSelection from "./pages/SortShiftSelection/SortShiftSelection";
-import SortShiftBubble from "./pages/SortShiftBubble/SortShiftBubble";
-import SortShiftInsertion from "./pages/SortShiftInsertion/SortShiftInsertion";
-import SnakeGame from "./pages/SnakeGame";
+import LandingPage from "./pages/LandingPage";
+import Module from "./pages/Module";
+import TypeTest from "./pages/TypeTest";
+import SortShift from "./pages/SortShift/SortShift"; // Import SortShift component
+import SortShiftSelection from "./pages/SortShiftSelection/SortShiftSelection"; // Import SortShiftSelection component
+import SortShiftBubble from "./pages/SortShiftBubble/SortShiftBubble"; // Import SortShiftBubble component
+import SortShiftInsertion from "./pages/SortShiftInsertion/SortShiftInsertion"; // Import SortShiftInsertion component
 const AppLayout = () => {
   const location = useLocation();
+
+  // State to manage login status
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+
+  // Restore login state from localStorage on page load
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setIsLoggedIn(true);
+      setUsername(storedUsername);
+    }
+  }, []);
+
+  // Function to update login state
+  const updateLoginState = (username) => {
+    setIsLoggedIn(true);
+    setUsername(username);
+    localStorage.setItem("username", username); // Save username to localStorage
+  };
 
   // Define routes that should only show the Header
   const headerOnlyRoutes = [
     "/type-test",
     "/sortshift",
-    "/sortshiftselection",
+    "sortshiftselection",
     "/sortshiftbubble",
     "/sortshiftinsertion",
-    "/snake-game",
   ];
 
   // Check if the current route is in the header-only routes
@@ -39,25 +54,35 @@ const AppLayout = () => {
 
   return (
     <div className="flex min-h-screen">
-      {!isHeaderOnlyRoute && (
-        <aside className="w-12 bg-gray-800 text-white z-10">
-          <Sidebar />
-        </aside>
-      )}
-      <div className="flex-1 flex flex-col">
-        {isHeaderOnlyRoute && <Header />}
-        {!isHeaderOnlyRoute && <Navbar />}
+      {/* Conditionally render Sidebar */}
+      {!isHeaderOnlyRoute && isLoggedIn && <Sidebar isLoggedIn={isLoggedIn} />}
+      <div
+        className={`flex-1 flex flex-col ${
+          !isHeaderOnlyRoute && isLoggedIn ? "ml-14" : ""
+        }`}
+      >
+        {/* Conditionally render Navbar or Header */}
+        {isHeaderOnlyRoute ? (
+          <Header />
+        ) : (
+          <Navbar
+            isLoggedIn={isLoggedIn}
+            username={username}
+            setIsLoggedIn={setIsLoggedIn}
+            setUsername={setUsername}
+          />
+        )}
         <main className="flex-1">
           <Routes>
-            <Route path="/sort" element={<SortRush />} />
-            <Route path="/type-test" element={<TypeTest />} />
-            <Route path="/module" element={<Module />} />
             <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
+            <Route
+              path="/login"
+              element={<Login updateLoginState={updateLoginState} />}
+            />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/badges" element={<CreateBadgeForm />} />
+            <Route path="/module" element={<Module />} />
+            <Route path="/type-test" element={<TypeTest />} />
             <Route path="/sortshift" element={<SortShift />} />
-            <Route path="/snake-game" element={<SnakeGame />} />
             <Route
               path="/sortshiftselection"
               element={<SortShiftSelection />}

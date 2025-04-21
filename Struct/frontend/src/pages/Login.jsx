@@ -1,7 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
+import PropTypes from "prop-types"; // Import PropTypes for props validation
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png"; // Import your Struct logo
 
-const Login = () => {
+const Login = ({ updateLoginState }) => {
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+  });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/accounts/login/",
+        {
+          username: formData.username,
+          password: formData.password,
+        }
+      );
+
+      if (response.status === 200) {
+        setSuccess("Login successful!");
+        localStorage.setItem("username", formData.username); // Store username in localStorage
+        updateLoginState(formData.username); // Update the Navbar state
+        setFormData({
+          username: "",
+          password: "",
+        });
+        navigate("/"); // Redirect to the homepage or dashboard
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.error || "An error occurred. Please try again."
+      );
+    }
+  };
+
   return (
     <div className="bg-gradient-to-r from-teal-600 to-teal-700 min-h-screen flex items-center justify-center">
       <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-lg relative">
@@ -18,20 +68,28 @@ const Login = () => {
           Log in to your account to continue learning.
         </p>
 
+        {/* Error/Success Messages */}
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {success && (
+          <p className="text-green-500 text-center mb-4">{success}</p>
+        )}
+
         {/* Login Form */}
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="block text-sm font-medium text-gray-700"
             >
-              Email Address
+              Username
             </label>
             <input
-              type="email"
-              id="email"
+              type="text"
+              id="username"
+              value={formData.username}
+              onChange={handleChange}
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
-              placeholder="Enter your email"
+              placeholder="Enter your username"
               required
             />
           </div>
@@ -45,6 +103,8 @@ const Login = () => {
             <input
               type="password"
               id="password"
+              value={formData.password}
+              onChange={handleChange}
               className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
               placeholder="Enter your password"
               required
@@ -58,9 +118,6 @@ const Login = () => {
               />
               <span className="ml-2 text-sm text-gray-600">Remember me</span>
             </label>
-            {/* <a href="#" className="text-sm text-teal-500 hover:underline">
-              Forgot password?
-            </a> */}
           </div>
           <button
             type="submit"
@@ -83,6 +140,11 @@ const Login = () => {
       </div>
     </div>
   );
+};
+
+// Add PropTypes validation
+Login.propTypes = {
+  updateLoginState: PropTypes.func.isRequired, // Ensure updateLoginState is a required function
 };
 
 export default Login;

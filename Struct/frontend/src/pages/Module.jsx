@@ -23,6 +23,10 @@ const Module = () => {
     navigate("/type-test"); // Redirect to Typing Test page
   };
 
+  const handleSortingRedirect = () => {
+    navigate("/sortshift"); // Redirect to Typing Test page
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -169,7 +173,10 @@ const Module = () => {
 
               <div className="p-4 bg-white rounded-lg shadow-md flex items-center justify-between">
                 <p className="text-gray-600">Sorting Game</p>
-                <button className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600">
+                <button
+                  onClick={handleSortingRedirect}
+                  className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600"
+                >
                   <FaPlay />
                 </button>
               </div>
