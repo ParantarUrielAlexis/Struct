@@ -9,9 +9,7 @@ const LandingPage = () => {
         <h1 className="text-5xl font-bold tracking-wide mb-4">
           Welcome to Struct Academy
         </h1>
-        <p className="text-lg font-light">
-          Learn, play, and master data structures and algorithms.
-        </p>
+        <p className="text-lg font-light">Learn, play, and master arrays!</p>
       </header>
 
       {/* Call to Action Section */}

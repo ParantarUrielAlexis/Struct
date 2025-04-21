@@ -13,7 +13,7 @@ const Signup = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -64,32 +64,32 @@ const Signup = () => {
 
   return (
     <div className="bg-gradient-to-r from-teal-700 to-teal-600 min-h-screen flex items-center justify-center">
-      <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-xl relative">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md relative">
         {/* Struct Logo */}
-        <div className="absolute top-4 right-4">
-          <img src={logo} alt="Struct Academy Logo" className="h-10" />
+        <div className="absolute top-2 right-2">
+          <img src={logo} alt="Struct Academy Logo" className="h-8" />
         </div>
 
         {/* Header */}
-        <h2 className="text-4xl font-bold text-teal-500 text-center mb-6">
+        <h2 className="text-2xl font-bold text-teal-500 text-center mb-4">
           Create an Account
         </h2>
-        <p className="text-gray-600 text-center mb-8">
+        <p className="text-sm text-gray-600 text-center mb-4">
           Join Struct Academy and start your learning journey today.
         </p>
 
         {/* Error/Success Messages */}
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {error && <p className="text-red-500 text-center mb-2">{error}</p>}
         {success && (
-          <p className="text-green-500 text-center mb-4">{success}</p>
+          <p className="text-green-500 text-center mb-2">{success}</p>
         )}
 
         {/* Sign Up Form */}
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-xs font-medium text-gray-700"
             >
               Username
             </label>
@@ -98,7 +98,7 @@ const Signup = () => {
               id="username"
               value={formData.username}
               onChange={handleChange}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"
               placeholder="Enter your username"
               required
             />
@@ -106,7 +106,7 @@ const Signup = () => {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-xs font-medium text-gray-700"
             >
               Email Address
             </label>
@@ -115,7 +115,7 @@ const Signup = () => {
               id="email"
               value={formData.email}
               onChange={handleChange}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"
               placeholder="Enter your email"
               required
             />
@@ -123,7 +123,7 @@ const Signup = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-xs font-medium text-gray-700"
             >
               Password
             </label>
@@ -132,7 +132,7 @@ const Signup = () => {
               id="password"
               value={formData.password}
               onChange={handleChange}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"
               placeholder="Create a password"
               required
             />
@@ -140,7 +140,7 @@ const Signup = () => {
           <div>
             <label
               htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-xs font-medium text-gray-700"
             >
               Confirm Password
             </label>
@@ -149,7 +149,7 @@ const Signup = () => {
               id="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-sm"
               placeholder="Confirm your password"
               required
             />
@@ -164,21 +164,21 @@ const Signup = () => {
             />
             <label
               htmlFor="showPassword"
-              className="ml-2 text-sm text-gray-600"
+              className="ml-2 text-xs text-gray-600"
             >
               Show Password
             </label>
           </div>
           <button
             type="submit"
-            className="w-full bg-teal-500 text-white py-3 px-4 rounded-lg shadow-md hover:bg-teal-600 transition duration-300"
+            className="w-full bg-teal-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-teal-600 transition duration-300 text-sm"
           >
             Sign Up
           </button>
         </form>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-4 text-center text-xs text-gray-600">
           Already have an account?{" "}
           <a
             href="/login"
