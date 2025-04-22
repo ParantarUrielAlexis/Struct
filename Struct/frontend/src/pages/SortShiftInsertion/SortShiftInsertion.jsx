@@ -40,6 +40,14 @@ const SortShiftInsertion = () => {
         setOriginalArray(randomArray);
         setGrids([randomArray]);
     }, []);
+    useEffect(() => {
+        const sound = backgroundSound.current;
+    
+        return () => {
+            sound.pause();
+            sound.currentTime = 0;
+        };
+    }, []);
 
     const swapSound = new Audio("/sounds/swap.mp3");
     const clickSound = new Audio("/sounds/first_click.mp3");
@@ -209,7 +217,7 @@ const SortShiftInsertion = () => {
     return (
         <div className={styles['short-shift-container']}>
             <video className={styles['background-video']} autoPlay loop muted>
-            <source src="/video/insertion2_bg.mp4" type="video/mp4" />
+            <source src="/video/insertion_bg.mp4" type="video/mp4" />
             Your browser does not support the video tag.
             </video>
 

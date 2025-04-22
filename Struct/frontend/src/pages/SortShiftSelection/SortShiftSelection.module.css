@@ -15,17 +15,17 @@
     margin-top: 20px;
     margin-bottom: 20px;
     font-family: Arial, sans-serif;
-    color: rgb(37, 32, 32);;
+    color: rgb(255, 255, 255);;
     animation: fadeSlideIn 0.8s ease-in-out; /* Apply the animation */
     }
   
     
     .background-video {
-        position: absolute;
+        position: fixed; /* Use fixed to ensure it covers the entire viewport */
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw; /* Ensure it spans the full width of the viewport */
+        height: 110vh; /* Ensure it spans the full height of the viewport */
         object-fit: cover;
         z-index: -1; /* Ensure it stays behind other content */
     }
@@ -55,14 +55,14 @@
     font-size: 16px;
     margin-bottom: 10px;
     animation: fadeSlideIn 0.8s ease-in-out; /* Apply the animation */
-    color: rgb(37,37,37);
+    color: rgb(244, 244, 244);
     }
     
     .array-label {
     font-weight: bold;
     margin-bottom: 10px;
     animation: fadeSlideIn 0.8s ease-in-out; /* Apply the animation */
-    color: rgb(37,37,37);
+    color: rgb(220, 220, 220);
     
     }
     
@@ -84,8 +84,8 @@
     .grid-item {
     width: 70px;
     height: 70px;
-    background-color: #ffb310;
-    color: black;
+    background-color: #4f5058;
+    color: rgb(255, 255, 255);
     font-size: 32px;
     display: flex;
     align-items: center;
@@ -102,8 +102,8 @@
     .orig-grid-item {
     width: 50px;
     height: 50px;
-    background-color: #ffb310;;
-    color: black;
+    background-color:#4f5058;
+    color: rgb(255, 255, 255);
     font-size: 24px;
     display: flex;
     align-items: center;
@@ -115,8 +115,8 @@
     }
     
     .grid-item.selected {
-    border: 2px solid red;
-    box-shadow: 0 0 10px red;
+    border: 2px solid rgb(185, 5, 191);
+    box-shadow: 0 0 10px rgb(185, 5, 191);
     }
     
     .controls {
@@ -145,15 +145,17 @@
     }
     
     .add-btn {
-    background-color: rgb(1, 210, 1);
+    background-color: rgb(189, 189, 189);
     color: rgb(37,37,37);
     }
     .remove-btn {
-    background-color: red;
+    font-size: 18px;
+    font-style: bold;
+    background-color: rgb(118, 118, 118);
     color: rgb(37,37,37);
     }
     .iterations {
-    border: 3px solid black;
+    border: 3px solid rgb(255, 255, 255);
     padding: 10px; /* Reduce inner spacing */
     margin: 10px auto; /* Reduce space around */
     width: 630px; /* Adjust width to content */
@@ -162,7 +164,7 @@
     align-items: center;
     transition: all 0.3s ease-in-out;
     animation: fadeSlideIn 0.8s ease-in-out; /* Apply the animation */
-    color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
     }
     
     .iterations h2 {
@@ -178,10 +180,10 @@
     }
     
     .submit-btn {
-    background-color: #ffb310;
+    background-color: #4f5058;
     height: 50px;
     width: 300px;
-    color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
     padding: 10px 20px;
     font-size: 16px;
     border: none;

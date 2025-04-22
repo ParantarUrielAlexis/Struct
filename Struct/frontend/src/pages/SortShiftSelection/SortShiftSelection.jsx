@@ -38,6 +38,14 @@ const SortShiftSelection= () => {
         setOriginalArray(randomArray);
         setGrids([randomArray]);
     }, []);
+    useEffect(() => {
+        const sound = backgroundSound.current;
+    
+        return () => {
+            sound.pause();
+            sound.currentTime = 0;
+        };
+    }, []);
 
     const swapSound = new Audio("/sounds/swap.mp3");
     const clickSound = new Audio("/sounds/first_click.mp3");

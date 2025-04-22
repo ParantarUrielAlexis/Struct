@@ -39,6 +39,14 @@ const SortShiftBubble = () => {
         setGrids([randomArray]);
     }, []);
 
+    useEffect(() => {
+        const sound = backgroundSound.current;
+    
+        return () => {
+            sound.pause();
+            sound.currentTime = 0;
+        };
+    }, []);
     const swapSound = new Audio("/sounds/swap.mp3");
     const clickSound = new Audio("/sounds/first_click.mp3");
 
@@ -82,8 +90,7 @@ const SortShiftBubble = () => {
         const sound = backgroundSound.current;
         sound.volume = 0.2; 
         sound.loop = true; 
-        sound.play();
-        
+        sound.play();   
     };
 
 

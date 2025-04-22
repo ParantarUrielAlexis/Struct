@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import selectionLogo from '../../assets/selection/Selection sort.jpg';
-import insertionLogo from '../../assets/insertion/insertion_sort.jpg';
-import bubbleLogo from '../../assets/bubble/bubble_sort.jpg';
+import selectionLogo from '../../assets/selection/selection_sort.png';
+import insertionLogo from '../../assets/insertion/insertion_sort.png';
+import bubbleLogo from '../../assets/bubble/bubble_sort.png';
 import './SortShift.css';
 
 const levels = [
