@@ -1,16 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import unsortedImg from '../../assets/selection/unsorted.png';
-import firstIteration from '../../assets/selection/first_iteration.png';
-import secondIteration from '../../assets/selection/second_iteration.png';
-import thirdIteration from '../../assets/selection/third_iteration.png';
-import fourthIteration from '../../assets/selection/fourth_iteration.png';
-import fifthIteration from '../../assets/selection/fifth_iteration.png';
-import sixthIteration from '../../assets/selection/sixth_iteration.png';
-import firstSwapped from '../../assets/selection/swapped1.png';
-import secondSwapped from '../../assets/selection/swapped2.png';
-import thirdSwapped from '../../assets/selection/swapped3.png';
-import forthSwapped from '../../assets/selection/swapped4.png';
-import simulation from '../../assets/selection/selection_gif.gif';
+import simulation from '../../assets/selection/selection_simulation.gif';
 
 import musicLogo from '../../assets/music.png';
 import tutorialLogo from '../../assets/tutorial.png';
