@@ -10,7 +10,7 @@ import firstSwapped from '../../assets/selection/swapped1.png';
 import secondSwapped from '../../assets/selection/swapped2.png';
 import thirdSwapped from '../../assets/selection/swapped3.png';
 import forthSwapped from '../../assets/selection/swapped4.png';
-import simulation from '../../assets/selection/simulation.gif';
+import simulation from '../../assets/selection/selection_gif.gif';
 
 import musicLogo from '../../assets/music.png';
 import tutorialLogo from '../../assets/tutorial.png';
@@ -40,15 +40,6 @@ const SortShiftSelection = () => {
             content: (
                 <>
                     <p><strong>Selection sort </strong>is a basic sorting algorithm that works by repeatedly finding the smallest (or largest) element from the unsorted part of the list and swapping it with the first element of that part. It continues this process until the entire list is sorted</p>
-                    <div className="simulation-container">
-                        <p style={{ margin: "0", padding: "0" }}>Here's how it works step by step:</p>
-                    </div>
-                    <ol>
-                        <li>Start with an unsorted array.</li>
-                        <li>Swap it with the first element of the unsorted part</li>
-                        <li>Move the boundary between the sorted and unsorted sections one step forward.</li>
-                        <li>Repeat until the whole list is sorted.</li>
-                    </ol>
                     <p>Watch the simulation to see how the algorithm works in real-time.</p>
                     <img src={simulation} alt="Iteration GIF" className="simulation-gif" />
                 </>
@@ -289,10 +280,7 @@ const SortShiftSelection = () => {
 
     return (
         <div className={styles["short-shift-container"]}>
-            <video className={styles["background-video"]} autoPlay loop muted>
-                <source src="/video/selection_bg.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-            </video>
+            
             {isTutorialOpen && (
                 <div className={styles["tutorial-modal"]}>
                     <div className={styles["tutorial-content"]}>

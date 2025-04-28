@@ -73,6 +73,8 @@
     margin-top: 10px;
     flex-wrap: wrap; /* Wrap items if they exceed the width */
     animation: fadeSlideIn 0.2s ease-in-out; /* Apply the animation */
+    
+    gap: 8px;
     }
     .orig-grid-container {
     display: flex;
@@ -84,7 +86,7 @@
     .grid-item {
     width: 70px;
     height: 70px;
-    background-color: #ffb310;
+    background-color: #ffeec8;
     color: black;
     font-size: 32px;
     display: flex;
@@ -531,7 +533,7 @@
     
    
     .tutorial-content {
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, 0.84);
     padding: 20px;
     border-radius: 10px;
     height: 85%; 
