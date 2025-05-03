@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import Class
+from .models import Class, UserLog
 
 User = get_user_model()
 
@@ -59,3 +59,8 @@ class ClassCreateSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['teacher'] = user
         return super().create(validated_data)
+    
+class UserLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserLog
+        fields = ['username', 'date_time', 'duration', 'score', 'remarks', 'attempts']

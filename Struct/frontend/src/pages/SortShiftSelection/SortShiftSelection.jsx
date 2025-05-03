@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef} from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import simulation from '../../assets/selection/selection_simulation.gif';
-
+import { useAuth } from "../../contexts/AuthContext"; // Adjust path as needed
 import musicLogo from '../../assets/music.png';
 import tutorialLogo from '../../assets/tutorial.png';
 
@@ -9,12 +10,12 @@ import styles from './SortShiftSelection.module.css';
 
 const SortShiftSelection = () => {
     const navigate = useNavigate();
-    const backgroundSound = useRef(new Audio("/sounds/selection_background.mp3")); 
+    const backgroundSound = useRef(new Audio("/sounds/selection_background.mp3"));
 
-    const generateRandomArray = () =>{
-        return Array.from({ length: 7}, () => Math.floor(Math.random() * 100) + 1 )
+    const generateRandomArray = () => {
+        return Array.from({ length: 7 }, () => Math.floor(Math.random() * 100) + 1)
     }
-    
+
     const [originalArray, setOriginalArray] = useState([]);
     const [grids, setGrids] = useState([originalArray.slice()]);
     const [selected, setSelected] = useState({ gridIndex: null, itemIndex: null });
@@ -23,7 +24,11 @@ const SortShiftSelection = () => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [isTutorialOpen, setIsTutorialOpen] = useState(true);
     const [isPlaying, setIsPlaying] = useState(true);
-    const [tutorialPage, setTutorialPage] = useState(0); // Track the current tutorial page
+    const [tutorialPage, setTutorialPage] = useState(0);
+    const [score, setScore] = useState(0);
+    const[startTime, setStartTime] = useState(null);
+    const [remarks, setRemarks] = useState("");
+    const { user } = useAuth(); // user should have username, email, etc.
 
     const tutorialPages = [
         {
@@ -33,7 +38,7 @@ const SortShiftSelection = () => {
                     <div className="simulation-text">
                         <p><strong>Selection sort </strong>is a basic sorting algorithm that works by repeatedly finding the smallest (or largest) element from the unsorted part of the list and swapping it with the first element of that part. It continues this process until the entire list is sorted</p>
                     </div>
-                    <br></br>
+                    <br />
                     <h2>Here are the steps: </h2>
                     <ol>
                         <li>Start from the beginning of the array and find the smallest element in the unsorted portion.</li>
@@ -42,8 +47,8 @@ const SortShiftSelection = () => {
                         <li>Repeat this process for the remaining unsorted portion of the array.</li>
                         <li>Continue until the entire array is sorted.</li>
                     </ol>
-                                        <p>Watch the simulation to see how the algorithm works in real-time.</p>
-                    <img src={simulation} alt="Iteration GIF" className="simulation-gif" />.
+                    <p>Watch the simulation to see how the algorithm works in real-time.</p>
+                    <img src={simulation} alt="Iteration GIF" className="simulation-gif" />
                     <p>Note: Even if the element is already sorted at the index n. You are still need to add an iteration inorder to get more points/score</p>
                 </>
             ),
@@ -52,18 +57,18 @@ const SortShiftSelection = () => {
             title: "Mechanics",
             content: (
                 <>
-                <h1>How to Play:</h1>
-                <ol>
-                    <li>Click on a box to select the element you want to move.</li>
-                    <li>Click on the target position in the sorted portion to insert the selected element.</li>
-                    <li>Repeat this process for each iteration until the entire array is sorted.</li>
-                    <li>Ensure that you follow the correct steps for each iteration to avoid penalties.</li>
-                    <li>Click the "Submit" button once you believe the array is sorted correctly.</li>
-                    <li>Use the "+" button to add a new grid/iteration or the "-" button to remove a grid/iteration if needed.</li>
-                    <li>Click the "Tutorial" button to revisit the instructions or the "Music" button to toggle background music.</li>
-                    <li>Earn points based on the accuracy and efficiency of your sorting process.</li>
-                </ol>
-            </>
+                    <h1>How to Play:</h1>
+                    <ol>
+                        <li>Click on a box to select the element you want to move.</li>
+                        <li>Click on the target position in the sorted portion to insert the selected element.</li>
+                        <li>Repeat this process for each iteration until the entire array is sorted.</li>
+                        <li>Ensure that you follow the correct steps for each iteration to avoid penalties.</li>
+                        <li>Click the "Submit" button once you believe the array is sorted correctly.</li>
+                        <li>Use the "+" button to add a new grid/iteration or the "-" button to remove a grid/iteration if needed.</li>
+                        <li>Click the "Tutorial" button to revisit the instructions or the "Music" button to toggle background music.</li>
+                        <li>Earn points based on the accuracy and efficiency of your sorting process.</li>
+                    </ol>
+                </>
             ),
         },
         {
@@ -71,7 +76,6 @@ const SortShiftSelection = () => {
             content: (
                 <>
                     <h1>How Scoring Works</h1>
-                    
                     <ul>
                         <li><strong>Correct Iterations:</strong> You earn points for each correct iteration. The total points are divided equally among the required iterations.</li>
                         <li><strong>Incorrect Iterations:</strong> Points are deducted for incorrect iterations.</li>
@@ -94,20 +98,25 @@ const SortShiftSelection = () => {
         const sound = backgroundSound.current;
         sound.volume = 0.3;
         sound.loop = true;
-    
-        // Cleanup function to stop the music when the component unmounts
+
         return () => {
             sound.pause();
-            sound.currentTime = 0; // Reset the music to the beginning
+            sound.currentTime = 0;
         };
     }, []);
-
+    useEffect(() => {
+        // Initialize attempts if not present
+        const attempts = localStorage.getItem("sortshift_attempts");
+        if (!attempts) {
+            localStorage.setItem("sortshift_attempts", "0");
+        }
+    }, []);
     const swapSound = new Audio("/sounds/swap.mp3");
     const clickSound = new Audio("/sounds/first_click.mp3");
 
     const toggleMusic = () => {
         const sound = backgroundSound.current;
-        if(sound.paused){
+        if (sound.paused) {
             sound.play();
             setIsPlaying(true);
         } else {
@@ -117,13 +126,10 @@ const SortShiftSelection = () => {
     }
 
     const handleSelect = (gridIndex, itemIndex) => {
-
         if (selected.gridIndex === null) {
             clickSound.play();
-            
             setSelected({ gridIndex, itemIndex });
         } else if (selected.gridIndex === gridIndex && selected.itemIndex !== itemIndex) {
-            
             swapNumbers(gridIndex, selected.itemIndex, itemIndex);
             swapSound.play();
             setSelected({ gridIndex: null, itemIndex: null });
@@ -139,7 +145,7 @@ const SortShiftSelection = () => {
         newGrids[gridIndex] = newGrid;
         setGrids(newGrids);
     };
-    
+
     const handleNext = () => {
         if (tutorialPage < tutorialPages.length - 1) {
             setTutorialPage(tutorialPage + 1);
@@ -154,18 +160,21 @@ const SortShiftSelection = () => {
 
     const closeTutorial = () => {
         setIsTutorialOpen(false);
+        setStartTime(Date.now());
         const sound = backgroundSound.current;
         sound.volume = 0.3;
         sound.loop = true;
         sound.play();
-        
     };
-
-
+    const getDurationString = (start, end) => {
+        const diff = Math.floor((end - start) / 1000);
+        const mins = String(Math.floor(diff / 60)).padStart(2, "0");
+        const secs = String(diff % 60).padStart(2, "0");
+        return `00:${mins}:${secs}`;
+    };
     const addGrid = () => {
         const addGridSound = new Audio("/sounds/add.mp3");
         addGridSound.play();
-        // Don't add new grids if the last grid is already sorted
         if (grids.length < 6) {
             setGrids([...grids, [...grids[grids.length - 1]]]);
         }
@@ -200,7 +209,7 @@ const SortShiftSelection = () => {
 
     const selectionSortSteps = () => {
         let arr = [...originalArray];
-        let steps = [arr.slice()]; 
+        let steps = [arr.slice()];
         for (let i = 0; i < arr.length - 1; i++) {
             let minIndex = i;
             for (let j = i + 1; j < arr.length; j++) {
@@ -211,8 +220,7 @@ const SortShiftSelection = () => {
             if (minIndex !== i) {
                 [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
             }
-            steps.push(arr.slice()); 
-
+            steps.push(arr.slice());
             if (isSorted(arr)) {
                 break;
             }
@@ -220,7 +228,6 @@ const SortShiftSelection = () => {
         return steps;
     };
 
-    
     const correctSteps = selectionSortSteps();
 
     const checkIteration = (grid, gridIndex) => {
@@ -236,60 +243,112 @@ const SortShiftSelection = () => {
                 [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
             }
         }
-
         if (gridIndex >= correctSteps.length - 1) {
             return false;
         }
-
         return JSON.stringify(grid) === JSON.stringify(arr);
     };
 
-    const checkSorting = () => {
+    
+    // --- USER LOGS INTEGRATION ---
+    const sendUserLog = async (logData) => {
+        try {
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+                console.error("Authentication token is missing.");
+                return;
+            }
+            await axios.post("http://localhost:8000/api/user-logs/", logData, {
+                headers: {
+                    Authorization: `Token ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+        } catch (error) {
+            if (error.response) {
+                console.error("Error saving user log:", error.response.data);
+                alert(JSON.stringify(error.response.data)); // Show backend error
+            } else {
+                console.error("Error saving user log:", error.message);
+            }
+        }
+    };
+
+    const checkSorting = async () => {
         let correctCount = 0;
         let incorrectCount = 0;
         let isPreviousCorrect = true;
-        let isAlreadySorted = false; 
-    
+        let isAlreadySorted = false;
+
         const results = grids.map((grid, index) => {
             if (isPreviousCorrect && !isAlreadySorted && checkIteration(grid, index)) {
                 if (isSorted(grid)) {
-                    isAlreadySorted = true; 
+                    isAlreadySorted = true;
                 }
                 correctCount++;
                 return { iteration: index + 1, correct: true };
             } else {
                 incorrectCount++;
-                isPreviousCorrect = false; 
+                isPreviousCorrect = false;
                 return { iteration: index + 1, correct: false };
             }
         });
-        
-    
+
         setIterationResults(results);
-        setIsModalOpen(true);
 
-    };
-    const totalPoints = 60;
-    const iterationsRequired = correctSteps.length - 1;
-    const pointsPerIteration = totalPoints / iterationsRequired;
-    const penaltyPerExtraIteration = pointsPerIteration / 4;
-    let score = 0;
+        // Calculate score and remarks
+        const totalPoints = 60;
+        const iterationsRequired = correctSteps.length - 1;
+        const pointsPerIteration = totalPoints / iterationsRequired;
+        const penaltyPerExtraIteration = pointsPerIteration / 4;
+        let calculatedScore = 0;
 
-    iterationResults.forEach((result, index) => {
-        if (index < iterationsRequired) {
-            if (result.correct) {
-                score += pointsPerIteration;
+        results.forEach((result, index) => {
+            if (index < iterationsRequired) {
+                if (result.correct) {
+                    calculatedScore += pointsPerIteration;
+                } else {
+                    calculatedScore -= penaltyPerExtraIteration;
+                }
             } else {
-                score -= penaltyPerExtraIteration;
+                calculatedScore -= penaltyPerExtraIteration;
             }
-        } else {
-            score -= penaltyPerExtraIteration;
-        }
-    });
+        });
 
-    score = Math.max(0, score);
-    const passingScore = 0.7 * totalPoints;
-    const remarks = score >= passingScore ? "Pass" : "Fail";
+        calculatedScore = Math.max(0, calculatedScore);
+        const passingScore = 0.7 * totalPoints;
+        const calculatedRemarks = calculatedScore >= passingScore ? "Pass" : "Fail";
+
+        setScore(calculatedScore.toFixed(2));
+        setRemarks(calculatedRemarks);
+
+        // Use username from context
+        const username = user?.username || "guest";
+
+        // Calculate duration if startTime is available
+        let duration = "00:00:00";
+        if (startTime) {
+            const endTime = Date.now();
+            const diff = Math.floor((endTime - startTime) / 1000);
+            const mins = String(Math.floor(diff / 60)).padStart(2, "0");
+            const secs = String(diff % 60).padStart(2, "0");
+            duration = `00:${mins}:${secs}`;
+        }
+
+        // Prepare log data
+        const logData = {
+            username: username,
+            date_time: new Date().toISOString(),
+            duration: duration,
+            score: parseFloat(calculatedScore.toFixed(2)),
+            remarks: calculatedRemarks,
+            attempts: 1, // You can increment this if you track attempts elsewhere
+        };
+
+        sendUserLog(logData);
+
+        setIsModalOpen(true);
+    };
 
     return (
         <div className={styles["short-shift-container"]}>
@@ -362,17 +421,6 @@ const SortShiftSelection = () => {
                             <button className={styles["remove-btn"]} onClick={removeGrid}>-</button>
                         </div>
                         {grids.map((grid, gridIndex) => {
-                            let correctResult = [...originalArray];
-                            for (let i = 0; i <= gridIndex; i++) {
-                                for (let j = 0; j < correctResult.length - i - 1; j++) {
-                                    if (correctResult[j] > correctResult[j + 1]) {
-                                        [correctResult[j], correctResult[j + 1]] = [correctResult[j + 1], correctResult[j]];
-                                    }
-                                }
-                            }
-
-                            const isExtraIteration = iterationResults.length > 0 && iterationResults[gridIndex]?.correct === false && isSorted(grids[gridIndex]);
-
                             return (
                                 <div key={gridIndex}>
                                     <h3 className={styles["iteration-title"]}>{getOrdinalSuffix(gridIndex + 1)} Iteration</h3>
@@ -431,38 +479,10 @@ const SortShiftSelection = () => {
                             <h2>Sorting Results</h2>
                         </div>
                         <div className={styles["score-container"]}>
-                            {(() => {
-                                const totalPoints = 60;
-                                const iterationsRequired = correctSteps.length - 1;
-                                const pointsPerIteration = totalPoints / iterationsRequired;
-                                const penaltyPerExtraIteration = pointsPerIteration / 2;
-                                let score = 0;
-
-                                iterationResults.forEach((result, index) => {
-                                    if (index < iterationsRequired) {
-                                        if (result.correct) {
-                                            score += pointsPerIteration;
-                                        } else {
-                                            score -= penaltyPerExtraIteration;
-                                        }
-                                    } else {
-                                        score -= penaltyPerExtraIteration;
-                                    }
-                                });
-
-                                score = Math.max(0, score);
-
-                                const passingScore = 0.7 * totalPoints;
-                                const remarks = score >= passingScore ? "Pass" : "Fail";
-                                const remarksClass = score >= passingScore ? styles["pass"] : styles["fail"];
-
-                                return (
-                                    <div className={styles["score-container"]}>
-                                        <p>Score: {score.toFixed(2)} / <span className={styles["total-points"]}>{totalPoints}</span></p>
-                                        <p>Remark: <span className={remarksClass}>{remarks}</span></p>
-                                    </div>
-                                );
-                            })()}
+                            <div className={styles["score-container"]}>
+                                <p>Score: {score} / <span className={styles["total-points"]}>60</span></p>
+                                <p>Remark: <span className={remarks === "Pass" ? styles["pass"] : styles["fail"]}>{remarks}</span></p>
+                            </div>
                         </div>
                         <div className={styles["results-container"]}>
                             <div>
@@ -508,7 +528,7 @@ const SortShiftSelection = () => {
                             </button>
                             <button
                                 className={styles["next-btn"]}
-                                onClick={() => navigate('/sortshift')} // Navigate to Bubble Sort page
+                                onClick={() => navigate('/sortshift')}
                                 disabled={remarks === "Fail"}
                             >
                                 Go Back
@@ -517,7 +537,6 @@ const SortShiftSelection = () => {
                     </div>
                 </div>
             )}
-            
         </div>
     );
 };
