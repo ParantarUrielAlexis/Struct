@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext";
 import musicLogo from '../../assets/music.png';
 import tutorialLogo from '../../assets/tutorial.png';
-
 import iterationGIF from '../../assets/bubble/bubble_simulation.gif';
-
 import styles from './SortShiftBubble.module.css';
 
 const SortShiftBubble = () => {
     const backgroundSound = useRef(new Audio("/sounds/bubble_background.mp3")); 
     const navigate = useNavigate();
+    const { user } = useAuth();
+
     const generateRandomArray = () =>{
         return Array.from({ length: 7}, () => Math.floor(Math.random() * 100) + 1 )
     }
@@ -23,6 +25,7 @@ const SortShiftBubble = () => {
     const [isTutorialOpen, setIsTutorialOpen] = useState(true);
     const [isPlaying, setIsPlaying] = useState(true);
     const [tutorialPage, setTutorialPage] = useState(0); 
+    const [startTime, setStartTime] = useState(null);
     const tutorialPages = [
         {
             title: "How Bubble Sort Works",
@@ -150,6 +153,7 @@ const SortShiftBubble = () => {
     
     const closeTutorial = () => {
         setIsTutorialOpen(false);
+        setStartTime(Date.now()); // Start the timer when the tutorial is closed
         const sound = backgroundSound.current;
         sound.volume = 0.2; 
         sound.loop = true; 
@@ -233,31 +237,105 @@ const SortShiftBubble = () => {
         return JSON.stringify(grid) === JSON.stringify(arr);
     };
 
+    // --- USER LOGS INTEGRATION ---
+    const sendUserLog = async (logData) => {
+        try {
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+                console.error("Authentication token is missing.");
+                return;
+            }
+            await axios.post("http://localhost:8000/api/user-logs/", logData, {
+                headers: {
+                    Authorization: `Token ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+        } catch (error) {
+            if (error.response) {
+                console.error("Error saving user log:", error.response.data);
+                alert(JSON.stringify(error.response.data));
+            } else {
+                console.error("Error saving user log:", error.message);
+            }
+        }
+    };
+
+    // Update checkSorting to send user log
     const checkSorting = () => {
         let correctCount = 0;
         let incorrectCount = 0;
-        let isPreviousCorrect = true; // Track if the previous iteration was correct
-        let isAlreadySorted = false; // Track if the array is already sorted
-    
+        let isPreviousCorrect = true;
+        let isAlreadySorted = false;
+
         const results = grids.map((grid, index) => {
             if (isPreviousCorrect && !isAlreadySorted && checkIteration(grid, index)) {
                 if (isSorted(grid)) {
-                    isAlreadySorted = true; // Mark as sorted if the current grid is sorted
+                    isAlreadySorted = true;
                 }
                 correctCount++;
                 return { iteration: index + 1, correct: true };
             } else {
                 incorrectCount++;
-                isPreviousCorrect = false; // Mark subsequent iterations as incorrect
+                isPreviousCorrect = false;
                 return { iteration: index + 1, correct: false };
             }
         });
-        
-    
-        setIterationResults(results);
-        setIsModalOpen(true); // Open the modal
 
+        setIterationResults(results);
+        setIsModalOpen(true);
+
+        // Calculate score and remarks
+        const totalPoints = 60;
+        const iterationsRequired = correctSteps.length - 1;
+        const pointsPerIteration = totalPoints / iterationsRequired;
+        const penaltyPerExtraIteration = pointsPerIteration / 2;
+        let calculatedScore = 0;
+
+        results.forEach((result, index) => {
+            if (index < iterationsRequired) {
+                if (result.correct) {
+                    calculatedScore += pointsPerIteration;
+                } else {
+                    calculatedScore -= penaltyPerExtraIteration;
+                }
+            } else {
+                calculatedScore -= penaltyPerExtraIteration;
+            }
+        });
+
+        calculatedScore = Math.max(0, calculatedScore);
+        const passingScore = 0.7 * totalPoints;
+        const calculatedRemarks = calculatedScore >= passingScore ? "Pass" : "Fail";
+
+        // Use username from context
+        const username = user?.username || "guest";
+
+        // Calculate duration (optional: add startTime logic if you want)
+        let duration = "00:00:00";
+        // If you have a startTime, use it here
+
+        if (startTime) {
+            const endTime = Date.now();
+            const diff = Math.floor((endTime - startTime) / 1000);
+            const mins = String(Math.floor(diff / 60)).padStart(2, "0");
+            const secs = String(diff % 60).padStart(2, "0");
+            duration = `00:${mins}:${secs}`;
+        }
+        // Prepare log data
+        const logData = {
+            username: username,
+            game_name: "Sort Shift - Bubble Sort",
+            date_time: new Date().toISOString(),
+            duration: duration,
+            score: parseFloat(calculatedScore.toFixed(2)),
+            remarks: calculatedRemarks,
+            attempts: 1,
+        };
+
+        sendUserLog(logData);
     };
+
     const totalPoints = 60;
     const iterationsRequired = correctSteps.length - 1;
     const pointsPerIteration = totalPoints / iterationsRequired;

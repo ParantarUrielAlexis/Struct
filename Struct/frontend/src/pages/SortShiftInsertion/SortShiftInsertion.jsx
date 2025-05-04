@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext";
 import simulation from '../../assets/insertion/insertion_simulation.gif';
 
 import musicLogo from '../../assets/music.png';
@@ -10,6 +12,7 @@ import styles from './SortShiftInsertion.module.css';
 const SortShiftInsertion = () => {
     const backgroundSound = useRef(new Audio("/sounds/insertion_background.mp3")); 
     const navigate = useNavigate();
+    const { user } = useAuth();
     const generateRandomArray = () =>{
         return Array.from({ length: 7}, () => Math.floor(Math.random() * 100) + 1 )
     }
@@ -23,6 +26,7 @@ const SortShiftInsertion = () => {
     const [isTutorialOpen, setIsTutorialOpen] = useState(true);
     const [isPlaying, setIsPlaying] = useState(true);
     const [tutorialPage, setTutorialPage] = useState(0); 
+    const [startTime, setStartTime] = useState(null); // Track the start time of the game
 
     const tutorialPages = [
     {
@@ -152,6 +156,7 @@ const SortShiftInsertion = () => {
     
     const closeTutorial = () => {
         setIsTutorialOpen(false);
+        setStartTime(Date.now()); // Set the start time when the tutorial is closed
         const sound = backgroundSound.current;
         sound.volume = 0.3; 
         sound.loop = true; 
@@ -231,6 +236,28 @@ const SortShiftInsertion = () => {
         return JSON.stringify(grid) === JSON.stringify(arr);
     };
 
+    const sendUserLog = async (logData) => {
+        try {
+            const token = localStorage.getItem("authToken");
+            if (!token) {
+                console.error("Authentication token is missing.");
+                return;
+            }
+            await axios.post("http://localhost:8000/api/user-logs/", logData, {
+                headers: {
+                    Authorization: `Token ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+        } catch (error) {
+            if (error.response) {
+                console.error("Error saving user log:", error.response.data);
+                alert(JSON.stringify(error.response.data)); // Show backend error
+            } else {
+                console.error("Error saving user log:", error.message);
+            }
+        }
+    };
     const checkSorting = () => {
         let correctCount = 0;
         let incorrectCount = 0;
@@ -251,6 +278,55 @@ const SortShiftInsertion = () => {
 
         setIterationResults(results);
         setIsModalOpen(true);
+        
+        // Calculate score and remarks
+        const totalPoints = 60;
+        const iterationsRequired = correctSteps.length - 1;
+        const pointsPerIteration = totalPoints / iterationsRequired;
+        const penaltyPerExtraIteration = pointsPerIteration / 4;
+        let calculatedScore = 0;
+
+        results.forEach((result, index) => {
+            if (index < iterationsRequired) {
+                if (result.correct) {
+                    calculatedScore += pointsPerIteration;
+                } else {
+                    calculatedScore -= penaltyPerExtraIteration;
+                }
+            } else {
+                calculatedScore -= penaltyPerExtraIteration;
+            }
+        });
+
+        calculatedScore = Math.max(0, calculatedScore);
+        const passingScore = 0.7 * totalPoints;
+        const calculatedRemarks = calculatedScore >= passingScore ? "Pass" : "Fail";
+
+        // Use username from context
+        const username = user?.username || "guest";
+
+        // Calculate duration if startTime is available
+        let duration = "00:00:00";
+        if (startTime) {
+            const endTime = Date.now();
+            const diff = Math.floor((endTime - startTime) / 1000);
+            const mins = String(Math.floor(diff / 60)).padStart(2, "0");
+            const secs = String(diff % 60).padStart(2, "0");
+            duration = `00:${mins}:${secs}`;
+        }
+
+        // Prepare log data
+        const logData = {
+            username: username,
+            game_name: "Sort Shift - Insertion Sort",
+            date_time: new Date().toISOString(),
+            duration: duration,
+            score: parseFloat(calculatedScore.toFixed(2)),
+            remarks: calculatedRemarks,
+            attempts: 1, // You can increment this if you track attempts elsewhere
+        };
+
+        sendUserLog(logData);
     };
     
 
