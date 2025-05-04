@@ -43,6 +43,7 @@ class Class(models.Model):
     
 class UserLog(models.Model):
     username = models.CharField(max_length=150)
+    game_name = models.CharField(max_length=100)
     date_time = models.DateTimeField()
     duration = models.CharField(max_length=20)
     score = models.FloatField()

@@ -338,6 +338,7 @@ const SortShiftSelection = () => {
         // Prepare log data
         const logData = {
             username: username,
+            game_name: "Sort Shift - Selection Sort",
             date_time: new Date().toISOString(),
             duration: duration,
             score: parseFloat(calculatedScore.toFixed(2)),

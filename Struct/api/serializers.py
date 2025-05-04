@@ -63,4 +63,4 @@ class ClassCreateSerializer(serializers.ModelSerializer):
 class UserLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLog
-        fields = ['username', 'date_time', 'duration', 'score', 'remarks', 'attempts']
+        fields = ['username','game_name', 'date_time', 'duration', 'score', 'remarks', 'attempts']
