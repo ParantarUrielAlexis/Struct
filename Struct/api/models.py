@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now
+from django.conf import settings
 import random
 import string
 
@@ -49,3 +50,15 @@ class UserLog(models.Model):
     score = models.FloatField()
     remarks = models.CharField(max_length=100)
     attempts = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.username} [{self.game_name}]"
+
+class UserProgress(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='progress')
+    selection_sort_passed = models.BooleanField(default=False)
+    bubble_sort_passed = models.BooleanField(default=False)
+    insertion_sort_passed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} Progress"

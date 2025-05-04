@@ -237,6 +237,20 @@ const SortShiftBubble = () => {
         return JSON.stringify(grid) === JSON.stringify(arr);
     };
 
+    // --- USER PROGRESS ---
+    const updateProgress = async () => {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
+        await axios.post(
+        'http://localhost:8000/api/user-progress/',
+        { bubble_sort_passed: true },
+        { headers: { Authorization: `Token ${token}` } }
+        );
+    } catch (err) {
+        // Optionally handle error
+    }
+    };
     // --- USER LOGS INTEGRATION ---
     const sendUserLog = async (logData) => {
         try {
@@ -334,6 +348,9 @@ const SortShiftBubble = () => {
         };
 
         sendUserLog(logData);
+        if(calculatedRemarks === "Pass"){
+            updateProgress();
+        }
     };
 
     const totalPoints = 60;

@@ -236,6 +236,19 @@ const SortShiftInsertion = () => {
         return JSON.stringify(grid) === JSON.stringify(arr);
     };
 
+    const updateProgress = async () => {
+        try {
+          const token = localStorage.getItem('authToken');
+          if (!token) return;
+          await axios.post(
+            'http://localhost:8000/api/user-progress/',
+            { insertion_sort_passed: true },
+            { headers: { Authorization: `Token ${token}` } }
+          );
+        } catch (err) {
+          // Optionally handle error
+        }
+      };
     const sendUserLog = async (logData) => {
         try {
             const token = localStorage.getItem("authToken");
@@ -327,6 +340,9 @@ const SortShiftInsertion = () => {
         };
 
         sendUserLog(logData);
+        if(calculatedRemarks === "Pass"){
+            updateProgress();
+        }
     };
     
 

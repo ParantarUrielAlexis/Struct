@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import Class, UserLog
+from .models import Class, UserLog, UserProgress
 
 User = get_user_model()
 
@@ -64,3 +64,8 @@ class UserLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserLog
         fields = ['username','game_name', 'date_time', 'duration', 'score', 'remarks', 'attempts']
+
+class UserProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProgress
+        fields = ['selection_sort_passed', 'bubble_sort_passed', 'insertion_sort_passed']

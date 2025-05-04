@@ -5,8 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from .serializers import UserRegistrationSerializer
-from .models import Class, UserLog
-from .serializers import ClassSerializer, ClassCreateSerializer, UserLogSerializer
+from .models import Class, UserLog, UserProgress
+from .serializers import ClassSerializer, ClassCreateSerializer, UserLogSerializer, UserProgressSerializer
 
 class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
@@ -127,3 +127,19 @@ class UserLogView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserProgressView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        progress, created = UserProgress.objects.get_or_create(user=request.user)
+        serializer = UserProgressSerializer(progress)
+        return Response(serializer.data)
+
+    def post(self, request):
+        progress, created = UserProgress.objects.get_or_create(user=request.user)
+        serializer = UserProgressSerializer(progress, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)

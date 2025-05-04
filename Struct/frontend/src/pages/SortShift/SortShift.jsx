@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import selectionLogo from '../../assets/selection/selection_sort.png';
 import insertionLogo from '../../assets/insertion/insertion_sort.png';
 import bubbleLogo from '../../assets/bubble/bubble_sort.png';
+import { useAuth } from '../../contexts/AuthContext';
 import './SortShift.css';
 
 const levels = [
@@ -13,22 +15,38 @@ const levels = [
 
 export default function SortShift() {
   const navigate = useNavigate();
-  
+  const { user } = useAuth();
+
   const gameStartSound = useRef(new Audio('/sounds/game_start_sound.mp3'));
   const backgroundSound = useRef(new Audio('/sounds/sortshift_background.mp3'));
   const [isLoading, setIsLoading] = useState(false);
   const [loadingImage, setLoadingImage] = useState(null);
   const [fadeIn, setFadeIn] = useState(false);
-  const [progress, setProgress] = useState(() => {
-    // Retrieve progress from localStorage or default to level 1
-    return parseInt(localStorage.getItem('progress')) || 1;
-  });
+  const [progress, setProgress] = useState(1);
 
+  // Fetch user progress from backend
   useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
+        const res = await axios.get('http://localhost:8000/api/user-progress/', {
+          headers: { Authorization: `Token ${token}` }
+        });
+        // Map backend progress to level number
+        let prog = 1;
+        if (res.data.selection_sort_passed) prog = 2;
+        if (res.data.bubble_sort_passed) prog = 3;
+        if (res.data.insertion_sort_passed) prog = 4;
+        setProgress(prog);
+      } catch (err) {
+        setProgress(1);
+      }
+    };
+    fetchProgress();
     const sound = backgroundSound.current;
     sound.loop = true;
     sound.play();
-
     return () => {
       sound.pause();
       sound.currentTime = 0;
@@ -53,11 +71,6 @@ export default function SortShift() {
       setFadeIn(true);
     }, 100);
     setTimeout(() => {
-      if (levelId === progress) {
-        const newProgress = progress + 1;
-        setProgress(newProgress);
-        localStorage.setItem('progress', newProgress); 
-      }
       navigate(path);
     }, 4000);
   };
@@ -92,7 +105,7 @@ export default function SortShift() {
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               cursor: level.id > progress ? 'not-allowed' : 'pointer',
-              opacity: level.id > progress ? 0.5 : 1, // Dim locked levels
+              opacity: level.id > progress ? 0.5 : 1,
             }}
           >
             <div className="overlay">
